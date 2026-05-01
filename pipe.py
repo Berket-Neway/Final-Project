@@ -25,4 +25,5 @@ class Pipe:
 
     def move(self):
         self.x -= self.dx
-        print(self.x)
+        self.rect.x = self.x
+        

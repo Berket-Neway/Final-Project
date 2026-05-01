@@ -5,13 +5,13 @@ import os
 from pipe import Pipe
 from bird import Player
 import time
-
+import random
 #explain what actor does
 
 # Screen dimensions
 WIDTH = 900
 HEIGHT = 600
-
+GAP = 100
 
 # Frame updates per second
 FPS = 30 # use with clock 
@@ -21,7 +21,7 @@ FPS = 30 # use with clock
 BACKGROUND_COLOR = (0, 0, 0) # black
 SCORE_COLOR = (255, 255, 255) # bright yellow
 
-FileNotFoundError_RADIUS = 5
+
 SPEED = 5
 BIRD_COLOR = ( 0, 255, 255)
 BIRD_RADIUS = 25
@@ -54,30 +54,36 @@ def main(): # the game loop
     #instiate screen objects -- 2 paddles, one ball
     bird = Player(WIDTH//2, HEIGHT//2, BIRD_RADIUS, SPEED, BIRD_COLOR)
     bird.direction = 0 
-    pipe = Pipe(200, 3 ,5, 10, 100, 10, PIPE_COLOR)
+    pipe_gap_y = random.randint(100, HEIGHT - 100 - GAP)
 
+    pipe = Pipe(WIDTH, 3 , 2, 10, pipe_gap_y, 10, PIPE_COLOR)
+    two_pipe = Pipe(WIDTH, 3 ,pipe_gap_y+ GAP, 10, HEIGHT - (pipe_gap_y + GAP), 10, "red")
     
     
 
     while running:
-    
+
+        
+        
         screen.fill(BACKGROUND_COLOR)
         pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2, 0, 10, HEIGHT))
         
-        pipe.move()
         
-        pipe.draw(screen)
         
+        
+   
         bird.draw(screen)
-              
-             
+           
+        pipe.draw(screen)
+        pipe.move()
+        two_pipe.draw(screen)
+        two_pipe.move()
         
 
         bird.update(bird.direction)
         
         left_bottom_edge = bird.y + bird.radius
-        print(left_bottom_edge)
-        print(HEIGHT)
+        
         if bird.y < 0:
             bird.y = 2
             bird.direction = 0
@@ -86,6 +92,21 @@ def main(): # the game loop
             
             bird.direction = 0
 
+      
+        
+        if bird.rect.colliderect(pipe):
+            print("death")
+        
+     
+        if bird.rect.colliderect(two_pipe) == True:
+            print("death")
+
+        if bird.rect.colliderect(pipe) == False and bird.rect.colliderect(two_pipe) == False and pipe.x == bird.x:
+            print("pass")
+
+        if pipe.x == 0 and two_pipe.x == 0:
+            pipe.x = WIDTH
+            two_pipe.x = WIDTH
         pygame.display.flip() # update the display
         clock.tick(FPS) # limit the frame rate to FPS
     
