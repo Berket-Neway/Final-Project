@@ -48,7 +48,7 @@ clock = pygame.time.Clock()
 def main(): # the game loop
     pipe_crossed = 0
     running = True
-    
+    bird_health = 3
 
 
     #instiate screen objects -- 2 paddles, one ball
@@ -59,7 +59,7 @@ def main(): # the game loop
     pipe = Pipe(WIDTH, 3 , 2, 10, pipe_gap_y, 10, PIPE_COLOR)
     two_pipe = Pipe(WIDTH, 3 ,pipe_gap_y+ GAP, 10, HEIGHT - (pipe_gap_y + GAP), 10, "red")
     
-    
+    game_over = False
 
     while running:
 
@@ -71,13 +71,12 @@ def main(): # the game loop
         
         
         
-   
-        bird.draw(screen)
-           
-        pipe.draw(screen)
-        pipe.move()
-        two_pipe.draw(screen)
-        two_pipe.move()
+        if game_over == False:
+            bird.draw(screen)
+            pipe.draw(screen)
+            pipe.move()
+            two_pipe.draw(screen)
+            two_pipe.move()
         
 
         bird.update(bird.direction)
@@ -96,20 +95,40 @@ def main(): # the game loop
         
         if bird.rect.colliderect(pipe):
             print("death")
+            bird_health -= 1
         
      
         if bird.rect.colliderect(two_pipe) == True:
             print("death")
+            bird_health -= 1
 
         if bird.rect.colliderect(pipe) == False and bird.rect.colliderect(two_pipe) == False and pipe.x == bird.x:
             print("pass")
 
-        if pipe.x == 0 and two_pipe.x == 0:
+        if pipe.x <= 0 and two_pipe.x <= 0:
             pipe.x = WIDTH
             two_pipe.x = WIDTH
+            pipe_gap_y = random.randint(100, HEIGHT - 100 - GAP)
+            pipe.rect.y = 0
+            pipe.rect.height = pipe_gap_y
+            
+            two_pipe.rect.y = pipe_gap_y + GAP
+            two_pipe.rect.height = HEIGHT - (pipe_gap_y + GAP)
+
+
+
+            pipe.dx += 0.2
+            two_pipe.dx += 0.2
+
+            
+
+
         pygame.display.flip() # update the display
         clock.tick(FPS) # limit the frame rate to FPS
     
+        if bird_health == 0:
+            game_over = True
+
         # Event handling -- check for all events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -128,8 +147,24 @@ def main(): # the game loop
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     bird.direction = 0.5
                     print("stopped moving")
-                
+
+        if game_over == True:
+            screen.fill((255, 255, 255))  # WHITE SCREEN
+
+            text = font.render("Game Over", True, (0, 0, 0))
+            screen.blit(text, (WIDTH//2 - 60, HEIGHT//2))
+            running = True
+
+    
+    
+    
+
+
+
+
+
 
 if __name__ == "__main__":
     main()
-    pygame.quit()
+    
+    # pygame.quit()
