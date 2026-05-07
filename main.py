@@ -60,23 +60,40 @@ def main(): # the game loop
     two_pipe = Pipe(WIDTH, 3 ,pipe_gap_y+ GAP, 10, HEIGHT - (pipe_gap_y + GAP), 10, "red")
     
     game_over = False
-
+    begin_game = True
     while running:
+        if begin_game:
+            screen.fill((255, 0, 0))  # WHITE SCREEN
 
+            text = font.render("Berket's Flappy Bird Clone", True, (0, 0, 0))
+            begin_text = font.render("Click the SPACE KEY to begin", True, (0, 0, 0))
+            help = f"Click the H key for Help"
+            help_text= font.render(str(help), True, (0, 0, 0))
+
+            screen.blit(text, (WIDTH//2 - 60, HEIGHT//2 - 30))
+            screen.blit(begin_text, (WIDTH//2 - 85, HEIGHT//2 ))
+            screen.blit(help_text,(WIDTH//2 - 110, HEIGHT//2 + 120))
+            
+            pygame.display.flip()
         
         
-        screen.fill(BACKGROUND_COLOR)
-        pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2, 0, 10, HEIGHT))
+     
         
         
+    
         
-        
-        if game_over == False:
+        if game_over == False and begin_game == False:
+            screen.fill(BACKGROUND_COLOR)
+            pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2, 0, 10, HEIGHT))
+            
             bird.draw(screen)
             pipe.draw(screen)
             pipe.move()
             two_pipe.draw(screen)
             two_pipe.move()
+            score_text = f"{pipe_crossed} |"
+            score_surface = font.render(str(score_text), True, "white")
+            screen.blit(score_surface, (WIDTH - 60, HEIGHT//2))
         
 
         bird.update(bird.direction)
@@ -101,11 +118,17 @@ def main(): # the game loop
         if bird.rect.colliderect(two_pipe) == True:
             print("death")
             bird_health -= 1
-
-        if bird.rect.colliderect(pipe) == False and bird.rect.colliderect(two_pipe) == False and pipe.x == bird.x:
+        print(pipe.x)
+        
+        if bird.rect.colliderect(pipe) == False and bird.rect.colliderect(two_pipe) == False and (pipe.x >= 450.0 and pipe.x <= 452.0) :
             print("pass")
+            pipe_crossed += 1
+            
+            
 
         if pipe.x <= 0 and two_pipe.x <= 0:
+            
+            
             pipe.x = WIDTH
             two_pipe.x = WIDTH
             pipe_gap_y = random.randint(100, HEIGHT - 100 - GAP)
@@ -116,18 +139,18 @@ def main(): # the game loop
             two_pipe.rect.height = HEIGHT - (pipe_gap_y + GAP)
 
 
-
-            pipe.dx += 0.2
-            two_pipe.dx += 0.2
-
+            pipe.dx += 0.5**pipe_crossed
+            two_pipe.dx += 0.5**pipe_crossed
+            
             
 
 
         pygame.display.flip() # update the display
         clock.tick(FPS) # limit the frame rate to FPS
     
-        if bird_health == 0:
+        if bird.rect.colliderect(pipe.rect) or bird.rect.colliderect(two_pipe.rect):
             game_over = True
+            pass
 
         # Event handling -- check for all events
         for event in pygame.event.get():
@@ -136,13 +159,22 @@ def main(): # the game loop
                 running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_0:
-                    print("zero key hit wooHOO")
-                
+                    print("zero key hit wooHOO")            
+                if event.key == pygame.K_r:
+                    print("game is restarted???")
+                    game_over = False
+                    pipe.x = WIDTH + 15
+                    two_pipe.x = WIDTH + 15
+                    pipe_crossed = 0
                 if event.key == pygame.K_w:
                     bird.direction = -1
-                    
                     print("going up")
-                    
+                if event.key == pygame.K_s:
+                    bird.direction = 1
+                    print("going down")
+                if event.key == pygame.K_SPACE:
+                    begin_game = False
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     bird.direction = 0.5
@@ -152,8 +184,17 @@ def main(): # the game loop
             screen.fill((255, 255, 255))  # WHITE SCREEN
 
             text = font.render("Game Over", True, (0, 0, 0))
-            screen.blit(text, (WIDTH//2 - 60, HEIGHT//2))
+            retry_text = font.render("Click the R KEY to restart", True, (0, 0, 0))
+            death_score_text = f"Crossed {pipe_crossed} Pipes"
+            death_score_surface = font.render(str(death_score_text), True, (0, 0, 0))
+
+            screen.blit(text, (WIDTH//2 - 60, HEIGHT//2 - 30))
+            screen.blit(death_score_surface, (WIDTH//2 - 85, HEIGHT//2 ))
+            screen.blit(retry_text,(WIDTH//2 - 110, HEIGHT//2 + 120))
+            
+            pygame.display.flip()
             running = True
+            
 
     
     
