@@ -1,7 +1,7 @@
 import sys, pygame
 from pygame import mixer
 
-HIT_COLOR = "red"
+HIT_COLOR = "black"
 
 class Player:
 
@@ -12,17 +12,22 @@ class Player:
         self.radius = radius
         self.speed = speed
         self.color = color
+        self.image = pygame.image.load("assets/bird.png").convert_alpha()
         
+
         width = 10
         height = 2*radius
-        
+        self.image = pygame.transform.scale(self.image, (self.radius *4 , self.radius*4))
 
         self.rect = pygame.Rect(self.x,self.y, width, height)
 
     def draw(self, canvas):
         pygame.draw.circle(canvas, self.color , (self.x, self.y+25), self.radius)
+        
+        canvas.blit(self.image, (self.x-45, self.y-28))
+        
     
-        pygame.draw.rect(canvas, HIT_COLOR , self.rect)
+        
     
     def update(self, direction):
         self.y += self.speed * direction

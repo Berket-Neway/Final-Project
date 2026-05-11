@@ -6,7 +6,7 @@ from pipe import Pipe
 from bird import Player
 import time
 import random
-#explain what actor does
+
 
 # Screen dimensions
 WIDTH = 900
@@ -23,12 +23,12 @@ SCORE_COLOR = (255, 255, 255) # bright yellow
 
 
 SPEED = 5
-BIRD_COLOR = ( 0, 255, 255)
+BIRD_COLOR = ( 0, 0, 0)
 BIRD_RADIUS = 25
 
-PIPE_COLOR = (0, 0, 255) # for now, later random colors 
+PIPE_COLOR = (0, 0, 66) # for now, later random colors 
 
-ITEM_COLOR = (0, 255, 0)  
+
 
 
 
@@ -41,6 +41,22 @@ font = pygame.font.SysFont("Arial", 22)
 
 screen = pygame.display.set_mode((WIDTH,HEIGHT))
 pygame.display.set_caption("Flappy bird by Berket")
+
+
+help_image = pygame.image.load("assets/help.png").convert_alpha()
+help_image = pygame.transform.scale(help_image, (150, 150))
+help_image = pygame.transform.flip(help_image, True, False)
+help_correct_image = pygame.image.load("assets/correct.png").convert_alpha()
+help_correct_image = pygame.transform.scale(help_correct_image, (150, 150))
+help_correct_image = pygame.transform.flip(help_correct_image, True, False)
+
+help_incorrect_image = pygame.image.load("assets/wrong.png").convert_alpha()
+help_incorrect_image = pygame.transform.scale(help_incorrect_image, (150, 200))
+help_incorrect_image = pygame.transform.flip(help_incorrect_image, True, False)
+
+
+
+
 
 # create a clock object to mark time
 clock = pygame.time.Clock()
@@ -56,13 +72,14 @@ def main(): # the game loop
     bird.direction = 0 
     pipe_gap_y = random.randint(100, HEIGHT - 100 - GAP)
 
-    pipe = Pipe(WIDTH, 3 , 2, 10, pipe_gap_y, 10, PIPE_COLOR)
-    two_pipe = Pipe(WIDTH, 3 ,pipe_gap_y+ GAP, 10, HEIGHT - (pipe_gap_y + GAP), 10, "red")
+    pipe = Pipe(WIDTH, 3, 2, 75, pipe_gap_y, 10, PIPE_COLOR, True)
+    two_pipe = Pipe(WIDTH, 3, pipe_gap_y + GAP, 75, HEIGHT - (pipe_gap_y + GAP), 10, PIPE_COLOR, False)
     
     game_over = False
     begin_game = True
+    help_screen = False
     while running:
-        if begin_game:
+        if begin_game and not help_screen:
             screen.fill((255, 0, 0))  # WHITE SCREEN
 
             text = font.render("Berket's Flappy Bird Clone", True, (0, 0, 0))
@@ -76,7 +93,28 @@ def main(): # the game loop
             
             pygame.display.flip()
         
-        
+        elif help_screen:
+            screen.fill((255, 255, 255))
+            text = font.render("Explaination:", True, (0, 0, 0))
+            begin_text = font.render("Click the SPACE KEY to EXIT", True, (0, 0, 0))
+            help_1 = font.render("In this game, you are controlling a bird that must cross pipes,", True, (0, 0, 0))
+            help_2 = font.render("use the W and S key to lead the bird through the pipes", True, (0, 0, 0))
+            help_3 = font.render("W makes bird go up", True, (0, 0, 0))
+            help_4 = font.render("S makes bird go down", True, (0, 0, 0))
+
+            
+
+            screen.blit(text, (35, 25))
+            screen.blit(begin_text, (35, HEIGHT - 25))
+            screen.blit(help_1,(35, 50 ))
+            screen.blit(help_2,(35, 75 ))
+            screen.blit(help_3,(35, 205))
+            screen.blit(help_4,(35 ,275 ))
+            screen.blit(help_image, (WIDTH-180, 50))
+            screen.blit(help_correct_image, (WIDTH-180, 205))
+            screen.blit(help_incorrect_image, (WIDTH-180, 360))
+            pygame.display.flip()
+
      
         
         
@@ -84,7 +122,7 @@ def main(): # the game loop
         
         if game_over == False and begin_game == False:
             screen.fill(BACKGROUND_COLOR)
-            pygame.draw.rect(screen, (255, 255, 255), (WIDTH//2, 0, 10, HEIGHT))
+            
             
             bird.draw(screen)
             pipe.draw(screen)
@@ -130,17 +168,21 @@ def main(): # the game loop
             
             
             pipe.x = WIDTH
+            pipe.rect.x = WIDTH
             two_pipe.x = WIDTH
+            two_pipe.rect.x = WIDTH
             pipe_gap_y = random.randint(100, HEIGHT - 100 - GAP)
             pipe.rect.y = 0
             pipe.rect.height = pipe_gap_y
+            pipe.image = pygame.transform.scale(pipe.image, (pipe.width, pipe.rect.height))
+            two_pipe.image = pygame.transform.scale(pipe.image, (pipe.width, pipe.rect.height+pipe_gap_y + GAP))
             
             two_pipe.rect.y = pipe_gap_y + GAP
             two_pipe.rect.height = HEIGHT - (pipe_gap_y + GAP)
 
 
-            pipe.dx += 0.5**pipe_crossed
-            two_pipe.dx += 0.5**pipe_crossed
+            pipe.dx += 0.1 * pipe_crossed
+            two_pipe.dx += 0.1 *pipe_crossed
             
             
 
@@ -158,9 +200,12 @@ def main(): # the game loop
                 print("bye")
                 running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_0:
-                    print("zero key hit wooHOO")            
-                if event.key == pygame.K_r:
+                if event.key == pygame.K_h and begin_game == True:
+                    print("zero key hit wooHOO")
+                    help_screen = True
+                    
+                                
+                if event.key == pygame.K_r and game_over == True:
                     print("game is restarted???")
                     game_over = False
                     pipe.x = WIDTH + 15
@@ -172,9 +217,11 @@ def main(): # the game loop
                 if event.key == pygame.K_s:
                     bird.direction = 1
                     print("going down")
-                if event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE and begin_game == True and help_screen == False:
                     begin_game = False
-
+                    
+                if event.key == pygame.K_SPACE and help_screen == True:
+                    help_screen = False
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w or event.key == pygame.K_s:
                     bird.direction = 0.5
