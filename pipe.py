@@ -10,8 +10,7 @@ class Pipe:
         self.speed = speed
         self.color = color
         self.image = pygame.image.load("assets/pipe.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (self.width, self.height)
-        )
+        self.image = pygame.transform.scale(self.image, (self.width, self.height))
         
 
         self.rect = pygame.Rect(x, y, width, height)
@@ -20,7 +19,7 @@ class Pipe:
             
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
-        screen.blit(self.image, (self.x, self.y))
+        screen.blit(self.image, self.rect)
     
     
     def update(self):

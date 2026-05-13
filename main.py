@@ -1,6 +1,5 @@
 
 import sys, pygame
-import random
 import os
 from pipe import Pipe
 from bird import Player
@@ -54,8 +53,9 @@ help_incorrect_image = pygame.image.load("assets/wrong.png").convert_alpha()
 help_incorrect_image = pygame.transform.scale(help_incorrect_image, (150, 200))
 help_incorrect_image = pygame.transform.flip(help_incorrect_image, True, False)
 
-
-
+tv_image = pygame.image.load("assets/TV.png").convert_alpha()
+tv_image = pygame.transform.scale(tv_image, (WIDTH+100, HEIGHT+100))
+tv_image = pygame.transform.flip(tv_image, True, False)
 
 
 # create a clock object to mark time
@@ -124,15 +124,17 @@ def main(): # the game loop
             screen.fill(BACKGROUND_COLOR)
             
             
+            
             bird.draw(screen)
             pipe.draw(screen)
             pipe.move()
             two_pipe.draw(screen)
             two_pipe.move()
+            screen.blit(tv_image, (-100,-50))
             score_text = f"{pipe_crossed} |"
             score_surface = font.render(str(score_text), True, "white")
-            screen.blit(score_surface, (WIDTH - 60, HEIGHT//2))
-        
+            screen.blit(score_surface, (WIDTH - 100, HEIGHT//2))
+            
 
         bird.update(bird.direction)
         
@@ -174,11 +176,14 @@ def main(): # the game loop
             pipe_gap_y = random.randint(100, HEIGHT - 100 - GAP)
             pipe.rect.y = 0
             pipe.rect.height = pipe_gap_y
-            pipe.image = pygame.transform.scale(pipe.image, (pipe.width, pipe.rect.height))
-            two_pipe.image = pygame.transform.scale(pipe.image, (pipe.width, pipe.rect.height+pipe_gap_y + GAP))
-            
             two_pipe.rect.y = pipe_gap_y + GAP
             two_pipe.rect.height = HEIGHT - (pipe_gap_y + GAP)
+
+
+            pipe.image = pygame.transform.scale(pipe.image, (pipe.width, pipe.rect.height))
+            two_pipe.image = pygame.transform.scale(two_pipe.image, (two_pipe.width, two_pipe.rect.height))
+            
+           
 
 
             pipe.dx += 0.1 * pipe_crossed
