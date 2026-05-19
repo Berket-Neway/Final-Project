@@ -5,7 +5,12 @@ from pipe import Pipe
 from bird import Player
 import time
 import random
+from pygame import mixer
 
+pygame.init()
+pygame.mixer.init() 
+mixer.music.load("./sounds/point.mp3")
+mixer.music.set_volume(0.7)
 
 # Screen dimensions
 WIDTH = 900
@@ -163,6 +168,7 @@ def main(): # the game loop
         if bird.rect.colliderect(pipe) == False and bird.rect.colliderect(two_pipe) == False and (pipe.x >= 450.0 and pipe.x <= 452.0) :
             print("pass")
             pipe_crossed += 1
+            mixer.music.play()
             
             
 
